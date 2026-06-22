@@ -1,4 +1,4 @@
-﻿namespace incidentmanagement
+﻿namespace incidentmanagement.Models
 {
     public class Incident
     {   public int Id { get; set; }

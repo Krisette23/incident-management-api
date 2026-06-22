@@ -1,4 +1,4 @@
-﻿namespace incidentmanagement
+﻿namespace incidentmanagement.Models
 {
     public class Comment
     {
