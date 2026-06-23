@@ -32,6 +32,37 @@ namespace incidentmanagement.Controllers
             return Ok(incident);
         }
 
+        [HttpPut("{id}")]  
+        public async Task<IActionResult> Update(int id, Incident incident)
+        {
+            if (id != incident.Id)
+            {
+                return BadRequest();
+            }
+            _context.Entry(incident).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!IncidentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
+        }
+
+        private bool IncidentExists(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(Incident incident)
         {
@@ -39,5 +70,20 @@ namespace incidentmanagement.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incident);
         }
+
+
+        [HttpDelete("{id}")]   
+        public async Task<IActionResult> Delete(int id)
+        {
+            var incident = await _context.Incidents.FindAsync(id);
+            if (incident == null)
+            {
+                return NotFound();
+            }
+            _context.Incidents.Remove(incident);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }
