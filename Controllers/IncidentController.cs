@@ -96,7 +96,7 @@ namespace incidentmanagement.Controllers
 
 
         [HttpDelete("{id}")]   
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(DeleteIncidentDTO id)
         {
             var incident = await _context.Incidents.FindAsync(id);
             if (incident == null)
