@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using incidentmanagement.Models;
 using incidentmanagement.Database;
+using incidentmanagement.DTOs;
 
 namespace incidentmanagement.Controllers
 {
@@ -64,11 +65,33 @@ namespace incidentmanagement.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Incident incident)
+        public async Task<IActionResult> Create(CreateIncidentDTO dTO)
         {
+
+            var incident = new Incident
+            {
+                Title = dTO.Title,
+                Description = dTO.Description,
+                Priority = dTO.Priority
+            };
+
             _context.Incidents.Add(incident);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incident);
+            //return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incident);
+
+            var incidentResponse = new
+            {
+                incident.Id,
+                incident.Title,
+                incident.Description,
+                incident.Priority,
+                incident.Status,
+                incident.CreatedAt,
+                incident.CreatedByUserId,
+                incident.AssignedToUserId
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incidentResponse);
         }
 
 
