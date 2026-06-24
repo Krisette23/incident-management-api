@@ -131,7 +131,8 @@ namespace incidentmanagement.Controllers
                 Title = incident.Title,
                 Description = incident.Description,
                 Status = incident.Status,
-                Priority = incident.Priority
+                Priority = incident.Priority,
+                CreatedAt = DateTime.UtcNow
 
             };
 
