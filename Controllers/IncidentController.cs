@@ -63,29 +63,46 @@ namespace incidentmanagement.Controllers
         }
 
         [HttpPut("{id}")]  
-        public async Task<IActionResult> Update(int id, Incident incident)
+        public async Task<IActionResult> Update(int id, UpdateIncidentDTO dto)
         {
-            if (id != incident.Id)
+
+            var incident = await _context.Incidents.FindAsync(id);
+
+            if (incident == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-            _context.Entry(incident).State = EntityState.Modified;
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!IncidentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            incident.Title = dto.Title;
+            incident.Description = dto.Description;
+            incident.Status = dto.Status;
+
+
+            await _context.SaveChangesAsync();
+
             return NoContent();
+
+            //if (id != incident.Id)
+            //{
+            //    return BadRequest();
+            //}
+            //_context.Entry(incident).State = EntityState.Modified;
+            //try
+            //{
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!IncidentExists(id))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
+            //return NoContent();
         }
 
         private bool IncidentExists(int id)
