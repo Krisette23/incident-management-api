@@ -19,7 +19,18 @@ namespace incidentmanagement.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _context.Incidents.ToListAsync());
+            var incidents = await _context.Incidents.ToListAsync();
+            var incidentDTOs = incidents.Select(incident => new IncidentDTO
+            {
+                Id = incident.Id,
+                Title = incident.Title,
+                Description = incident.Description,
+                Status = incident.Status,
+                Priority = incident.Priority
+            }).ToList();
+
+            return Ok(incidentDTOs);
+            //return Ok(await _context.Incidents.ToListAsync());
         }
 
         [HttpGet("{id}")]
