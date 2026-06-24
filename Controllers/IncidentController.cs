@@ -36,12 +36,30 @@ namespace incidentmanagement.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var incident = await _context.Incidents.FindAsync(id);
+            var incident = await _context.Incidents
+            .Where(incident => incident.Id == id)
+             .Select(incident => new IncidentDTO
+                {
+                    Id = incident.Id,
+                    Title = incident.Title,
+                    Description = incident.Description,
+                    Status = incident.Status,
+                    Priority = incident.Priority
+                })
+             .FirstOrDefaultAsync();
+
             if (incident == null)
             {
                 return NotFound();
             }
             return Ok(incident);
+
+            //    var incident = await _context.Incidents.FindAsync(id);
+            //    if (incident == null)
+            //    {
+            //        return NotFound();
+            //    }
+            //    return Ok(incident);
         }
 
         [HttpPut("{id}")]  
