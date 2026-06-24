@@ -76,6 +76,8 @@ namespace incidentmanagement.Controllers
             incident.Title = dto.Title;
             incident.Description = dto.Description;
             incident.Status = dto.Status;
+            incident.Priority = dto.Priority;
+            incident.UpdatedAt = DateTime.UtcNow;
 
 
             await _context.SaveChangesAsync();
