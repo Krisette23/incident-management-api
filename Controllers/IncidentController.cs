@@ -79,16 +79,14 @@ namespace incidentmanagement.Controllers
             await _context.SaveChangesAsync();
             //return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incident);
 
-            var incidentResponse = new
+            var incidentResponse = new IncidentDTO
             {
-                incident.Id,
-                incident.Title,
-                incident.Description,
-                incident.Priority,
-                incident.Status,
-                incident.CreatedAt,
-                incident.CreatedByUserId,
-                incident.AssignedToUserId
+                Id = incident.Id,
+                Title = incident.Title,
+                Description = incident.Description,
+                Status = incident.Status,
+                Priority = incident.Priority
+
             };
 
             return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incidentResponse);
