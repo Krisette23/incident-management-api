@@ -34,7 +34,8 @@ namespace incidentmanagement.Controllers
             {
                 Username = dto.Username,
                 Email = dto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password) // Implement password hashing
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password), // Implement password hashing
+                Role = "User" // Default role, you can change this as needed
             };
 
             _context.Users.Add(user);
