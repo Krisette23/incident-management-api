@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using incidentmanagement.Database;
 using incidentmanagement.Models;
 using BCrypt.Net;
-
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace incidentmanagement.Controllers
 {
@@ -15,10 +18,11 @@ namespace incidentmanagement.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
-        public AuthController(ApplicationDbContext context)
+        private readonly IConfiguration _configuration;
+        public AuthController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
 
@@ -44,5 +48,57 @@ namespace incidentmanagement.Controllers
             // Implement registration logic here
             return Ok(new { message = "User registered successfully" });
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                return Unauthorized(new { message = "Invalid username or password" });
+            }
+
+
+
+
+            var tokenString = GenerateJwtToken(user);
+            return Ok(new { tokenString });
+
+            //// Generate JWT token
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            //var tokenDescriptor = new SecurityTokenDescriptor
+            //{
+            //    Subject = new ClaimsIdentity(new Claim[]
+            //    {
+            //        new Claim(ClaimTypes.Name, user.Id.ToString()),
+            //        new Claim(ClaimTypes.Role, user.Role)
+            //    }),
+            //    Expires = DateTime.UtcNow.AddHours(1),
+            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            //};
+            //var token = tokenHandler.CreateToken(tokenDescriptor);
+            //var tokenString = tokenHandler.WriteToken(token);
+            //return Ok(new { Token = tokenString });
+        }
+
+        public string GenerateJwtToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role)
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
+
 }
