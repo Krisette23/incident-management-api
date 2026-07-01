@@ -59,27 +59,15 @@ namespace incidentmanagement.Controllers
             }
 
 
-
-
+            bool validPassword = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+            if (!validPassword)
+            {
+                return Unauthorized(new { message = "Invalid username or password" });
+            }
             var tokenString = GenerateJwtToken(user);
-            return Ok(new { tokenString });
+             return Ok(new { token = tokenString });
 
-            //// Generate JWT token
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new Claim[]
-            //    {
-            //        new Claim(ClaimTypes.Name, user.Id.ToString()),
-            //        new Claim(ClaimTypes.Role, user.Role)
-            //    }),
-            //    Expires = DateTime.UtcNow.AddHours(1),
-            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            //};
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-            //var tokenString = tokenHandler.WriteToken(token);
-            //return Ok(new { Token = tokenString });
+
         }
 
         public string GenerateJwtToken(User user)
